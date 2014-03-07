@@ -20,8 +20,8 @@ When using an Arduino to power the sensor, an external power supply is better. M
  Wind Sensor Signals    Arduino
  GND                    GND
  +V                     5V
- RV                     A1
- TMP                    A0
+ RV                     A1    // modify the definitions below to use other pins
+ TMP                    A0    // modify the definitions below to use other pins
  
 
  Paul Badger 2014
@@ -33,9 +33,14 @@ When using an Arduino to power the sensor, an external power supply is better. M
  */
 
 
-#define analogPinForRV    1   // change to pins you are using
+#define analogPinForRV    1   // change to pins you the analog pins are using
 #define analogPinForTMP   0
 
+// to calibrate your sensor, put a glass over it, but the sensor should not be
+// touching the desktop surface however.
+// adjust the zeroWindAdjustment until your sensor reads about zero with the glass over it. 
+
+const float zeroWindAdjustment =  .2; // negative numbers yield smaller wind speeds and vice versa.
 
 int TMP_Therm_ADunits;  //temp termistor value from wind sensor
 float RV_Wind_ADunits;    //RV output from wind sensor 
@@ -77,7 +82,7 @@ void loop() {
 
     zeroWind_ADunits = -0.0006*((float)TMP_Therm_ADunits * (float)TMP_Therm_ADunits) + 1.0727 * (float)TMP_Therm_ADunits + 47.172;  //  13.0C  553  482.39
 
-    zeroWind_volts = zeroWind_ADunits * 0.0048828125;  
+    zeroWind_volts = (zeroWind_ADunits * 0.0048828125) - zeroWindAdjustment;  
 
     // This from a regression from data in the form of 
     // Vraw = V0 + b * WindSpeed ^ c
